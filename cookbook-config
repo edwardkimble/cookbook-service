@@ -6,7 +6,7 @@ endpoint = mysql-cookbook.cojppgykyqrr.us-east-2.rds.amazonaws.com
 port_number = 3306
 region_name = us-east-2
 user_name = admin
-db_name = photoapp
+db_name = cookbook_db
 
 [s3readwrite]
 region_name = us-east-2
