@@ -1,18 +1,23 @@
 // Inserts a new recipe into the database
+const { PutObjectCommand } = require("@aws-sdk/client-s3");
+const { s3, s3_bucket_name, s3_region_name } = require("../../utils/aws.js");
+
+const uuid = require("uuid");
 const { runQuery } = require("../../utils/utils.js");
 
 exports.put_recipe = async (req, res) => {
-  console.log("Put call to /recipes...");
+  console.log("Put call to /recipe...");
 
   try {
     const data = req.body; // data => JS object
 
-    const { title, instructions, ingredients } = data;
-    console.log({ data });
+    const { title, instructions, ingredients, img } = data;
+    const bytes = Buffer.from(img, "base64");
+    const key = uuid.v4();
 
     let cmd = `
-        INSERT INTO recipes (userid, title, instructions)
-        VALUES (${1}, "${title}", "${instructions}");
+        INSERT INTO recipes (userid, title, instructions, img)
+        VALUES (${1}, "${title}", "${instructions}", "${key}.jpg");
       `;
 
     let response = await runQuery(cmd);
@@ -38,6 +43,14 @@ exports.put_recipe = async (req, res) => {
     if (response.affectedRows !== ingredients.length) {
       throw new Error("failed to insert new rows");
     }
+
+    const s3Cmd = new PutObjectCommand({
+      Bucket: s3_bucket_name,
+      Key: key + ".jpg",
+      Body: bytes,
+    });
+
+    await s3.send(s3Cmd);
 
     res.status(200).json({
       message: "inserted",

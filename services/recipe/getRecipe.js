@@ -2,7 +2,7 @@
 const { runQuery } = require("../../utils/utils.js");
 
 exports.get_recipe = async (req, res) => {
-  console.log("Get call to /recipes/:id...");
+  console.log("Get call to /recipe/:id...");
 
   try {
     const { id } = req.params; // data => JS object
@@ -26,10 +26,6 @@ exports.get_recipe = async (req, res) => {
 
     if (recipe.length !== 1) {
       throw new Error("Failed to find recipe");
-    }
-
-    if (ingredients.length < 1) {
-      throw new Error("Failed to find ingredients");
     }
 
     const ingredientsList = ingredients.map((ingredient) => {
