@@ -20,7 +20,6 @@ const cookbook_config = ini.parse(
 );
 const s3_region_name = cookbook_config.s3readwrite.region_name;
 const s3_bucket_name = cookbook_config.s3.bucket_name;
-console.log({ cookbook_config });
 
 //
 // create s3 object for communicating with S3 service, but
