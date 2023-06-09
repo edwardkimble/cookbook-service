@@ -38,7 +38,7 @@ jobs:
           environment_name: cookbook-service-env
           version_label: "app-${{ steps.format-time.outputs.replaced }}"
           region: us-east-2
-          deployment_package: cookbook-xervice.zip
+          deployment_package: cookbook-service.zip
           wait_for_deployment: false
 
       - name: Deployed!
