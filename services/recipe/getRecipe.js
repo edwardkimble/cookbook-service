@@ -26,9 +26,11 @@ exports.get_recipe = async (req, res) => {
     const tagsPromise = runQuery(cmd);
 
     const timestamp = Math.floor(new Date().getTime()/1000.0);
+    console.log(timestamp);
 
     cmd = `
-    INSERT INTO timestamps (recipeid, timestamp) VALUES (${id}, ${timestamp})
+    INSERT INTO timestamps (recipeid, accesstime) VALUES (${id}, ${timestamp}) 
+    ON DUPLICATE KEY UPDATE accesstime = ${timestamp}
     `;
 
     const timestampPromise = runQuery(cmd)
