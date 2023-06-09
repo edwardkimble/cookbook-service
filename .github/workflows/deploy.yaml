@@ -1,0 +1,45 @@
+name: Deploy Cookbook Service to Elastic Beanstalk
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+    steps:
+      - name: Checkout Latest Repo
+        uses: actions/checkout@v2
+
+      - name: Zip files
+        run: zip -r cookbook-service.zip * -x "**.git**"
+
+      - name: Get timestamp
+        uses: gerred/actions/current-time@master
+        id: current-time
+
+      - name: Run string replace
+        uses: frabert/replace-string-action@master
+        id: format-time
+        with:
+          pattern: '[:\.]+'
+          string: "${{ steps.current-time.outputs.time }}"
+          replace-with: "-"
+          flags: "g"
+
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v21
+        with:
+          aws_access_key: "${{ secrets.AWS_EB_ACCESS_KEY }}"
+          aws_secret_key: "${{ secrets.AWS_EB_SECRET_ACCESS_KEY }}"
+          application_name: cookbook-service
+          environment_name: cookbook-service-env
+          version_label: "app-${{ steps.format-time.outputs.replaced }}"
+          region: us-east-2
+          deployment_package: cookbook-xervice.zip
+          wait_for_deployment: false
+
+      - name: Deployed!
+        run: echo Cookbook deployed to ELB
