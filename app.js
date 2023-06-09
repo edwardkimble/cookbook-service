@@ -17,10 +17,12 @@ app.use(express.json({ strict: false, limit: "50mb" }));
 var indexRouter = require("./routes/index");
 var recipeRouter = require("./routes/recipe");
 var recipesRouter = require("./routes/recipes");
+var imageRouter = require("./routes/image");
 
 app.use("/", indexRouter);
 app.use("/recipe", recipeRouter);
 app.use("/recipes", recipesRouter);
+app.use("/image", imageRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

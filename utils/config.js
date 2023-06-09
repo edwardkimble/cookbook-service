@@ -9,7 +9,7 @@
 const config = {
     cookbook_config: "cookbook-config",
     cookbook_profile: "s3readwrite",
-    service_port: 8080,
+    service_port: 8081,
     page_size: 12
   };
   

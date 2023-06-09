@@ -11,10 +11,10 @@ exports.put_recipe = async (req, res) => {
   try {
     const data = req.body; // data => JS object
 
-    const { title, instructions, ingredients, img } = data;
-    const bytes = Buffer.from(img, "base64");
+    const { title, instructions, ingredients, img, tags } = data;
+    const bytes = Buffer.from(img.replace(/^data:image\/\w+;base64,/, ''), "base64");
     const key = uuid.v4();
-
+    console.log({tags})
     let cmd = `
         INSERT INTO recipes (userid, title, instructions, img)
         VALUES (${1}, "${title}", "${instructions}", "${key}.jpg");
@@ -36,11 +36,25 @@ exports.put_recipe = async (req, res) => {
       cmd += `(${recipeid}, "${name}", ${amount}, "${measurement}"),`;
     });
     cmd = cmd.substring(0, cmd.length - 1) + ";";
-    console.log({ cmd });
 
-    response = await runQuery(cmd);
+    const ingredientsPromise = runQuery(cmd);
 
-    if (response.affectedRows !== ingredients.length) {
+    cmd =
+      "INSERT INTO tags (recipeid, tag) VALUES ";
+    tags.forEach((tag) => {
+
+      cmd += `(${recipeid}, "${tag}"),`;
+    });
+    cmd = cmd.substring(0, cmd.length - 1) + ";";
+
+    const tagsPromise = runQuery(cmd);
+
+    const [ingredientsResponse, tagsResponse] = await Promise.all([ingredientsPromise, tagsPromise]);
+
+    if (ingredientsResponse.affectedRows !== ingredients.length) {
+      throw new Error("failed to insert new rows");
+    }
+    if (tagsResponse.affectedRows !== tags.length) {
       throw new Error("failed to insert new rows");
     }
 
@@ -48,6 +62,7 @@ exports.put_recipe = async (req, res) => {
       Bucket: s3_bucket_name,
       Key: key + ".jpg",
       Body: bytes,
+      ContentType: 'image/jpeg'
     });
 
     await s3.send(s3Cmd);

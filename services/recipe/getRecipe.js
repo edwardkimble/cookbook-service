@@ -18,10 +18,26 @@ exports.get_recipe = async (req, res) => {
       `;
 
     const ingredientsPromise = runQuery(cmd);
+    
+    cmd = `
+      SELECT * FROM tags t WHERE t.recipeid = ${id}
+      `;
 
-    const [recipe, ingredients] = await Promise.all([
+    const tagsPromise = runQuery(cmd);
+
+    const timestamp = Math.floor(new Date().getTime()/1000.0);
+
+    cmd = `
+    INSERT INTO timestamps (recipeid, timestamp) VALUES (${id}, ${timestamp})
+    `;
+
+    const timestampPromise = runQuery(cmd)
+
+    const [recipe, ingredients, tags, timestamps] = await Promise.all([
       recipePromise,
       ingredientsPromise,
+      tagsPromise,
+      timestampPromise
     ]);
 
     if (recipe.length !== 1) {
@@ -36,6 +52,7 @@ exports.get_recipe = async (req, res) => {
     });
 
     recipe[0].ingredients = ingredientsList;
+    recipe[0].tags = tags
 
     res.status(200).json({
       message: "success",
