@@ -7,12 +7,13 @@ exports.get_recipes = async (req, res) => {
   try {
     const { tag } = req.query;
 
-    let cmd = 'SELECT recipeid, userid, title, instructions, img FROM recipes';
+    let cmd =
+      "SELECT r.recipeid, userid, title, instructions, img FROM recipes r";
 
     if (tag) {
-      cmd += ` r INNER JOIN tags t ON t.recipeid = r.recipeid WHERE t.tag = "${tag}"`;
+      cmd += ` INNER JOIN tags t ON t.recipeid = r.recipeid WHERE t.tag = "${tag}"`;
     }
-    console.log({cmd})
+    console.log({ cmd });
 
     const response = await runQuery(cmd);
 
@@ -21,6 +22,7 @@ exports.get_recipes = async (req, res) => {
       recipes: response,
     });
   } catch (err) {
+    console.log(err);
     //try
     res.status(400).json({
       message: err.message,
