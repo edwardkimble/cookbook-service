@@ -18,11 +18,13 @@ var indexRouter = require("./routes/index");
 var recipeRouter = require("./routes/recipe");
 var recipesRouter = require("./routes/recipes");
 var imageRouter = require("./routes/image");
+var tagsRouter = require("./routes/tags");
 
 app.use("/", indexRouter);
 app.use("/recipe", recipeRouter);
 app.use("/recipes", recipesRouter);
 app.use("/image", imageRouter);
+app.use("/tags", tagsRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
